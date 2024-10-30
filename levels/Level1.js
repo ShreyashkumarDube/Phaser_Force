@@ -46,9 +46,16 @@ export default class Level1 extends Phaser.Scene {
         const objectsLayer = map.createLayer('Objects', [forestTiles, roguelikeCityTiles, terrainTiles, tilemapTiles, tilesetFinal], 0, 0);
         const windowsLayer = map.createLayer('Windows', [forestTiles, roguelikeCityTiles, terrainTiles, tilemapTiles, tilesetFinal], 0, 0);
 
+        // Make objectsLayer collidable
+        objectsLayer.setCollisionByProperty({ collides: true }); // Assumes tiles with 'collides' property set in Tiled
+
+
         // Position the player at a start location on the map
         this.player = this.physics.add.sprite(100, 100, 'player'); // Adjust coordinates if needed
+        this.player.setCollideWorldBounds(true); // Restrict player within the world bounds
+        this.player.setBounce(0.2);
         
+                
         // Optionally, scale up the player sprite to make it larger
         this.player.setScale(1); // Adjust the scale factor as needed
 
@@ -58,6 +65,9 @@ export default class Level1 extends Phaser.Scene {
         // Set the camera bounds to match the map size
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
 
+        // Set physics world bounds to allow player to move to the edges of the map
+        this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
         // Optional: Set zoom level to show more of the map (adjust the zoom level as needed)
         this.cameras.main.setZoom(1); // Change this as needed
 
@@ -66,6 +76,10 @@ export default class Level1 extends Phaser.Scene {
 
         // Define input for player movement
         this.cursors = this.input.keyboard.createCursorKeys();
+        
+        // Add collision between player and collidable layer
+        this.physics.add.collider(this.player, objectsLayer);
+
     }
 
     update() {
